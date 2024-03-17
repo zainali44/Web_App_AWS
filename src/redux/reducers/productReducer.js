@@ -1,125 +1,66 @@
-/*
- ** Author: Santosh Kumar Dash
- ** Author URL: http://santoshdash.epizy.com/
- ** Github URL: https://github.com/quintuslabs/fashion-cube
- */
-
 import {
-  GET_ALL_PRODUCTS_BEGIN,
-  GET_ALL_PRODUCTS_SUCCESS,
-  GET_ALL_PRODUCTS_FAIL,
-  GET_PRODUCT_BEGIN,
-  GET_PRODUCT_SUCCESS,
-  GET_PRODUCT_FAIL,
-  GET_PRODUCTS_BY_CATEGORY_BEGIN,
-  GET_PRODUCTS_BY_CATEGORY_SUCCESS,
-  GET_PRODUCTS_BY_CATEGORY_FAIL,
-  SEARCH_BEGIN,
-  SEARCH_SUCCESS,
-  SEARCH_FAIL,
-  APPLY_FILTERS_BEGIN,
-  APPLY_FILTERS_SUCCESS,
-  APPLY_FILTERS_FAIL
-} from "../actions/productAction";
+  ADD_PRODUCT_SUCCESS,
+  CLEAR_SEARCH_STATE, EDIT_PRODUCT_SUCCESS,
+  GET_PRODUCTS_SUCCESS, REMOVE_PRODUCT_SUCCESS,
+  SEARCH_PRODUCT_SUCCESS
+} from '@/constants/constants';
 
-const initialState = {
-  products: null,
-  product: null,
-  loading: false,
-  error: null
+const initState = {
+  lastRefKey: null,
+  total: 0,
+  items: []
 };
 
-export default (state = initialState, action) => {
+export default (state = {
+  lastRefKey: null,
+  total: 0,
+  items: [],
+  searchedProducts: initState
+}, action) => {
   switch (action.type) {
-    case GET_ALL_PRODUCTS_BEGIN:
+    case GET_PRODUCTS_SUCCESS:
       return {
         ...state,
-        loading: true,
-        error: null
+        lastRefKey: action.payload.lastKey,
+        total: action.payload.total,
+        items: [...state.items, ...action.payload.products]
       };
-    case GET_ALL_PRODUCTS_SUCCESS:
+    case ADD_PRODUCT_SUCCESS:
       return {
         ...state,
-        loading: false,
-        products: action.payload.data.products
+        items: [...state.items, action.payload]
       };
-    case GET_ALL_PRODUCTS_FAIL:
+    case SEARCH_PRODUCT_SUCCESS:
       return {
         ...state,
-        loading: false,
-        error: action.payload.error.response.data
+        searchedProducts: {
+          lastRefKey: action.payload.lastKey,
+          total: action.payload.total,
+          items: [...state.searchedProducts.items, ...action.payload.products]
+        }
       };
-    case GET_PRODUCT_BEGIN:
+    case CLEAR_SEARCH_STATE:
       return {
         ...state,
-        loading: true,
-        error: null
+        searchedProducts: initState
       };
-    case GET_PRODUCT_SUCCESS:
+    case REMOVE_PRODUCT_SUCCESS:
       return {
         ...state,
-        loading: false,
-        product: action.payload.data.product
+        items: state.items.filter((product) => product.id !== action.payload)
       };
-    case GET_PRODUCT_FAIL:
+    case EDIT_PRODUCT_SUCCESS:
       return {
         ...state,
-        loading: false,
-        error: action.payload.error.response.data
-      };
-    case GET_PRODUCTS_BY_CATEGORY_BEGIN:
-      return {
-        ...state,
-        loading: true,
-        error: null
-      };
-    case GET_PRODUCTS_BY_CATEGORY_SUCCESS:
-      return {
-        ...state,
-        loading: false,
-        products: action.payload.data.products
-      };
-    case GET_PRODUCTS_BY_CATEGORY_FAIL:
-      return {
-        ...state,
-        loading: false,
-        error: action.payload.error.response.data
-      };
-    case SEARCH_BEGIN:
-      return {
-        ...state,
-        loading: true,
-        error: null
-      };
-    case SEARCH_SUCCESS:
-      return {
-        ...state,
-        loading: false,
-        products: action.payload.data.products
-      };
-    case SEARCH_FAIL:
-      return {
-        ...state,
-        loading: false,
-        error: action.payload.error.response.data
-      };
-    case APPLY_FILTERS_BEGIN:
-      return {
-        ...state,
-        loading: true,
-        error: null
-      };
-    case APPLY_FILTERS_SUCCESS:
-      return {
-        ...state,
-        loading: false,
-        products: action.payload.data.products
-      };
-    case APPLY_FILTERS_FAIL:
-      return {
-        ...state,
-        loading: false,
-        error: action.payload.error.response.data
+        items: state.items.map((product) => {
+          if (product.id === action.payload.id) {
+            return {
+              ...product,
+              ...action.payload.updates
+            };
+          }
+          return product;
+        })
       };
     default:
       return state;

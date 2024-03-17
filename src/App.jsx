@@ -1,43 +1,24 @@
-import './App.css'
-import config from './config/config.js'
-import React,{ useEffect, useState,Suspense } from 'react'
-import { useDispatch } from 'react-redux'
-import authService from './appwrite/auth.js'
-import { login ,logout} from './store/authSlice.js'
-import Header from './components/Header/Header.jsx'
-import Footer from './components/Footer.jsx'
-import { Outlet } from 'react-router-dom'
+/* eslint-disable react/forbid-prop-types */
+import { Preloader } from '@/components/common';
+import PropType from 'prop-types';
+import React, { StrictMode } from 'react';
+import { Provider } from 'react-redux';
+import { PersistGate } from 'redux-persist/integration/react';
+import AppRouter from '@/routers/AppRouter';
 
-function App() {
-  const [loading,setLoading]=useState(true);
-  const dispatch = useDispatch();
+const App = ({ store, persistor }) => (
+  <StrictMode>
+    <Provider store={store}>
+      <PersistGate loading={<Preloader />} persistor={persistor}>
+        <AppRouter />
+      </PersistGate>
+    </Provider>
+  </StrictMode>
+);
 
-  useEffect(() => { 
-      authService.getCurrentUser().then((user) => {
-        if (user) {
-          dispatch(login({ userData: user }));
-        }else{
-          dispatch(logout());
-        }
-        setLoading(false);
-      });
-    }, []);
+App.propTypes = {
+  store: PropType.any.isRequired,
+  persistor: PropType.any.isRequired
+};
 
-
-    if (loading == true) {
-      return <div className='text-3xl font-bold bg-black text-[#FD356D] w-full h-[100vh] flex items-center justify-center'>Loading...</div>;
-    } else {
-      return (
-        <div className='font-serif italic bg-black min-h-[100vh] w-full'>
-          <Header />
-          <Suspense fallback={<div className='text-3xl font-bold bg-black text-[#FD356D] w-full h-[100vh] flex items-center justify-center'>Loading...</div>}>
-            <Outlet />
-          </Suspense>
-          <Footer />
-        </div>
-      );
-    }
-  
-}
-
-export default App
+export default App;

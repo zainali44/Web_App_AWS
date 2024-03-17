@@ -1,24 +1,21 @@
-/*
- ** Author: Santosh Kumar Dash
- ** Author URL: http://santoshdash.epizy.com/
- ** Github URL: https://github.com/quintuslabs/fashion-cube
- */
+import authReducer from './authReducer';
+import basketReducer from './basketReducer';
+import checkoutReducer from './checkoutReducer';
+import filterReducer from './filterReducer';
+import miscReducer from './miscReducer';
+import productReducer from './productReducer';
+import profileReducer from './profileReducer';
+import userReducer from './userReducer';
 
-import { combineReducers } from "redux";
-import login from "./LoginReducer";
-import register from "./RegisterReducer";
-import department from "./DepartmentReducer";
-import product from "./productReducer";
-import variant from "./variantsReducer";
-import cart from "./cartReducer";
-// import checkout from './checkoutReducer'
-// import filter from './filterReducer'
+const rootReducer = {
+  products: productReducer,
+  basket: basketReducer,
+  auth: authReducer,
+  profile: profileReducer,
+  filter: filterReducer,
+  users: userReducer,
+  checkout: checkoutReducer,
+  app: miscReducer
+};
 
-export default combineReducers({
-  department,
-  login,
-  register,
-  product,
-  variant,
-  cart
-});
+export default rootReducer;
